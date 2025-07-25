@@ -780,86 +780,81 @@ undefined4 *zero_memory_aligned(undefined4 *address, uint size)
 
 
 
-void FUN_0000047e(uint param_1,undefined1 *param_2,uint param_3)
-
+void read_data_from_memory(uint address, undefined1 *buffer, uint size)
 {
-  undefined1 uVar1;
-  
-  for (; param_3 != 0; param_3 = param_3 - 1 & 0xffff) {
-    uVar1 = FUN_000004a0(param_1);
-    *param_2 = uVar1;
-    param_2 = param_2 + 1;
-    param_1 = param_1 + 1 & 0xffff;
-  }
-  return;
+    undefined1 data_byte;
+
+    for (; size != 0; size = size - 1 & 0xffff) {
+        data_byte = read_byte_from_memory(address);
+        *buffer = data_byte;
+        buffer = buffer + 1;
+        address = address + 1 & 0xffff;
+    }
+    return;
 }
 
 
 
-undefined4 FUN_000004a0(uint param_1)
-
+undefined4 read_byte_from_memory(uint address)
 {
-  undefined4 uVar1;
-  
-  FUN_00001684();
-  FUN_00001628(((int)(param_1 + ((uint)((int)param_1 >> 0x1f) >> 0x18)) >> 8) * 2 + 0xa0U & 0xff);
-  FUN_000016f8();
-  FUN_00001628(param_1 & 0xff);
-  FUN_000016f8();
-  FUN_00001684();
-  FUN_00001628(0xa1);
-  FUN_000016f8();
-  uVar1 = FUN_000015cc(0);
-  FUN_000016c0();
-  return uVar1;
+    undefined4 value;
+
+    FUN_00001684();
+    FUN_00001628(((int)(address + ((uint)((int)address >> 0x1f) >> 0x18)) >> 8) * 2 + 0xa0U & 0xff);
+    FUN_000016f8();
+    FUN_00001628(address & 0xff);
+    FUN_000016f8();
+    FUN_00001684();
+    FUN_00001628(0xa1);
+    FUN_000016f8();
+    value = FUN_000015cc(0);
+    FUN_000016c0();
+    return value;
 }
 
 
 
-void FUN_000004f8(uint param_1,undefined1 *param_2,uint param_3)
-
+void write_data_to_memory(uint address, undefined1 *data, uint size)
 {
-  bool bVar1;
-  
-  while (bVar1 = param_3 != 0, param_3 = param_3 - 1 & 0xffff, bVar1) {
-    FUN_0000051c(param_1,*param_2);
-    param_1 = param_1 + 1 & 0xffff;
-    param_2 = param_2 + 1;
-  }
-  return;
+    bool has_more_data;
+
+    while (has_more_data = size != 0, size = size - 1 & 0xffff, has_more_data) {
+        write_byte_to_memory(address, *data);
+        address = address + 1 & 0xffff;
+        data = data + 1;
+    }
+    return;
 }
 
 
 
-void FUN_0000051c(uint param_1,undefined4 param_2)
-
+void write_byte_to_memory(uint address, undefined4 value)
 {
-  FUN_00001684();
-  FUN_00001628(((int)(param_1 + ((uint)((int)param_1 >> 0x1f) >> 0x18)) >> 8) * 2 + 0xa0U & 0xff);
-  FUN_000016f8();
-  FUN_00001628(param_1 & 0xff);
-  FUN_000016f8();
-  FUN_00001628(param_2);
-  FUN_000016f8();
-  FUN_000016c0();
-  FUN_00005460(10);
-  return;
+    FUN_00001684();
+    FUN_00001628(((int)(address + ((uint)((int)address >> 0x1f) >> 0x18)) >> 8) * 2 + 0xa0U & 0xff);
+    FUN_000016f8();
+    FUN_00001628(address & 0xff);
+    FUN_000016f8();
+    FUN_00001628(value);
+    FUN_000016f8();
+    FUN_000016c0();
+    FUN_00005460(10);
+    return;
 }
 
 
 
-void FUN_0000056c(void)
-
+void initialize_gpio(void)
 {
-  undefined4 in_r3;
-  undefined4 local_8 [2];
-  
-  local_8[0] = in_r3;
-  FUN_00001d84(8,1);
-  local_8[0] = 0x10030001;
-  FUN_000012b6(DAT_00000598,local_8);
-  *DAT_0000059c = 0;
-  return;
+    undefined4 initial_value;
+    undefined4 gpio_config[2];
+
+    gpio_config[0] = initial_value;
+    FUN_00001d84(8, 1);
+    gpio_config[0] = 0x10030001;
+    FUN_000012b6(DAT_00000598, gpio_config);
+    *DAT_0000059c = 0;
+    return;
 }
 
 

@@ -32,5 +32,8 @@ void rfid_get_baud_rate(void);
 void rfid_set_baud_rate(byte *param_1);
 void rfid_get_inventory_mode(void);
 void rfid_set_inventory_mode(byte *param_1);
+uint16_t rfid_read_response(uint8_t *buffer, uint16_t length);
+bool rfid_has_data(void);
+void rfid_init(void);
 
 #endif // RFID_H

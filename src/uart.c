@@ -35,3 +35,8 @@ uint16_t uart_read(uint8_t *data, uint16_t length)
   }
   return i;
 }
+
+bool uart_has_data(void)
+{
+    return (USART1_SR & 0x20) != 0;
+}

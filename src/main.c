@@ -2,7 +2,6 @@
 #include "uart.h"
 #include "rfid.h"
 #include "utils.h"
-#include <stdio.h>
 
 // Command buffer
 uint8_t command_buffer[256];
@@ -74,7 +73,7 @@ void process_rfid_data(void)
     // This function will be implemented in a future step.
     // For now, we'll just print the data to the console.
     if (response_buffer[0] != 0) {
-        printf("RFID data: %s\n", response_buffer);
+        // RFID data processing (printf removed for embedded)
     }
 }
 

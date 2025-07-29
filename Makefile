@@ -5,7 +5,7 @@
 #
 # Toolchain
 #
-CC = arm-none-eabi-gcc
+CC = $(shell which arm-none-eabi-gcc 2>/dev/null || echo gcc)
 LD = arm-none-eabi-ld
 AR = arm-none-eabi-ar
 AS = arm-none-eabi-as
@@ -15,7 +15,7 @@ OD = arm-none-eabi-objdump
 #
 # C flags
 #
-CFLAGS = -Wall -O2 -g -mcpu=cortex-m3 -mthumb -I.
+CFLAGS = -Wall -O2 -g -mcpu=cortex-m3 -mthumb -I. -nostdlib -ffreestanding
 
 #
 # Source files
@@ -23,39 +23,48 @@ CFLAGS = -Wall -O2 -g -mcpu=cortex-m3 -mthumb -I.
 SRCS = src/main.c \
        src/rfid.c \
        src/uart.c \
-       src/utils.c \
-       fw.c \
-       syscalls.c
+       src/utils.c
+
+#
+# Build directory
+#
+BUILD_DIR = build
 
 #
 # Object files
 #
-OBJS = $(SRCS:.c=.o)
+OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/rfid.o $(BUILD_DIR)/uart.o $(BUILD_DIR)/utils.o
 
 #
 # Executable file
 #
-EXE = rfid_reader.elf
+EXE = $(BUILD_DIR)/rfid_reader.elf
 
 #
 # Default target
 #
-all: $(EXE)
+all: $(BUILD_DIR) $(EXE)
+
+#
+# Create build directory
+#
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
 #
 # Link the executable
 #
 $(EXE): $(OBJS)
-	$(CC) $(CFLAGS) -T stm32f103.ld -o $@ $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS)
 
 #
 # Compile the source files
 #
-%.o: %.c
+$(BUILD_DIR)/%.o: src/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 #
 # Clean the project
 #
 clean:
-	rm -f $(OBJS) $(EXE)
+	rm -rf $(BUILD_DIR)

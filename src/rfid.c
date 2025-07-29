@@ -1,7 +1,10 @@
 #include "rfid.h"
 #include "uart.h"
 #include "utils.h"
-#include "fw.h"
+//#include "fw.h"
+
+// Define the variable here
+uint DAT_00003884;
 
 void rfid_delay(uint16_t milliseconds)
 {

@@ -3,6 +3,8 @@
 
 #include "main.h"
 
+extern uint DAT_00003884;
+
 void rfid_delay(uint16_t milliseconds);
 uint8_t rfid_get_response(uint8_t command);
 void rfid_send_command(uint8_t *command, uint16_t length);

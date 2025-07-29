@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include "rfid.h"
 #include "uart.h"
 #include "utils.h"
@@ -23,9 +24,20 @@ uint8_t rfid_get_response(uint8_t command)
   return response;
 }
 
-void rfid_send_command(uint8_t *command, uint16_t length)
+#include <stdarg.h>
+
+void rfid_send_command(uint8_t *command, uint16_t length, ...)
 {
+  va_list args;
+  va_start(args, length);
+
+  uint8_t *p = command;
+  for (int i = 0; i < length; i++) {
+    *p++ = va_arg(args, int);
+  }
+
   uart_write(command, length);
+  va_end(args);
 }
 
 void watchdog_reset(void)
@@ -33,141 +45,587 @@ void watchdog_reset(void)
   // This is a placeholder for the watchdog reset function.
 }
 
-void rfid_get_reader_info(void)
+rfid_result_t rfid_get_reader_info(rfid_reader_info_t *info)
 {
-    // This function is a placeholder for the refactored code.
+    if (info == NULL)
+    {
+        return RFID_RESULT_INVALID_PARAM;
+    }
+
+    // Reverse engineered from FUN_00003cc0
+    uint32_t *ptr = (uint32_t *)0x790003A0;
+    info->device_id = ptr[0];
+    info->device_version = ptr[1];
+
+    return RFID_RESULT_OK;
 }
 
 void rfid_get_freq_hopping(void)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  bVar2 = 0;
+  uVar3 = 0;
+  rfid_send_command((uint8_t *)0x9204, 2, 4, 0);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x24);
+  if ((bVar2 == 0x55) && (bVar1 == 0x41)) {
+    //FUN_00004264();
+  }
+  return;
 }
 
 void rfid_set_freq_hopping(byte *param_1)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  uVar3 = 0;
+  bVar2 = *param_1;
+  if (*param_1 < 0x3a) {
+    bVar1 = *param_1 - 0x30;
+  }
+  else if (*param_1 < 0x61) {
+    bVar1 = *param_1 - 0x37;
+  }
+  bVar2 = bVar1 * 0x10;
+  bVar1 = param_1[1];
+  if (bVar1 < 0x3a) {
+    bVar1 = bVar1 - 0x30;
+  }
+  else if (bVar1 < 0x61) {
+    bVar1 = bVar1 - 0x37;
+  }
+  rfid_send_command((uint8_t*)0x9204, 2, 6, bVar2 + bVar1);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x24);
+  return;
 }
 
 void rfid_get_antenna_power(void)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  bVar2 = 0;
+  uVar3 = 0;
+  rfid_send_command((uint8_t *)0x9206, 2, 4, 0);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x24);
+  if ((bVar2 == 0x55) && (bVar1 == 0x41)) {
+    //FUN_00004264();
+  }
+  return;
 }
 
 void rfid_set_antenna_power(byte param_1)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  uint32_t uVar2;
+
+  bVar1 = 0;
+  uVar2 = 0;
+  if (param_1 < 0x3a) {
+    bVar1 = param_1 - 0x30;
+  }
+  else if (param_1 < 0x61) {
+    bVar1 = param_1 - 0x37;
+  }
+  rfid_send_command((uint8_t*)0x9206, 2, 6, bVar1);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar2,0x24);
+  return;
 }
 
 void rfid_set_gpio(byte *param_1)
 {
-    // This function is a placeholder for the refactored code.
+  rfid_send_command((uint8_t *)0x91, 2, param_1[0], param_1[1]);
+  rfid_delay(100);
+  // ... read response ...
 }
 
 void rfid_get_firmware_version(void)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  bVar2 = 0;
+  uVar3 = 0;
+  rfid_send_command((uint8_t *)0xa1, 2, 0, 0);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x1c);
+  if ((bVar2 == 0x55) && (bVar1 == 0)) {
+    //FUN_00004e64();
+  }
+  return;
 }
 
 void rfid_inventory(byte param_1, byte param_2, byte param_3)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  bVar2 = 0;
+  uVar3 = 0;
+  if (param_1 < 0x3a) {
+    bVar1 = param_1 - 0x30;
+  }
+  else if (param_1 < 0x61) {
+    bVar1 = param_1 - 0x37;
+  }
+  bVar2 = bVar1 * 0x10;
+  if (param_2 < 0x3a) {
+    bVar1 = param_2 - 0x30;
+  }
+  else if (param_2 < 0x61) {
+    bVar1 = param_2 - 0x37;
+  }
+  bVar2 = bVar2 + bVar1;
+  if (param_3 < 0x3a) {
+    bVar1 = param_3 - 0x30;
+  }
+  else if (param_3 < 0x61) {
+    bVar1 = param_3 - 0x37;
+  }
+  rfid_send_command((uint8_t *)0x4152, 2, bVar2,bVar1);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x24);
+  return;
 }
 
 void rfid_read_tag(byte param_1, byte param_2, byte param_3, byte *param_4)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  bVar2 = 0;
+  uVar3 = 0;
+
+  if (param_1 < 0x3a) {
+    bVar1 = param_1 - 0x30;
+  }
+  else if (param_1 < 0x61) {
+    bVar1 = param_1 - 0x37;
+  }
+  bVar2 = bVar1 * 0x10;
+  if (param_2 < 0x3a) {
+    bVar1 = param_2 - 0x30;
+  }
+  else if (param_2 < 0x61) {
+    bVar1 = param_2 - 0x37;
+  }
+  bVar2 = bVar2 + bVar1;
+  if (param_3 < 0x3a) {
+    bVar1 = param_3 - 0x30;
+  }
+  else if (param_3 < 0x61) {
+    bVar1 = param_3 - 0x37;
+  }
+
+  rfid_send_command((uint8_t *)0x4157, 4, bVar2, bVar1, param_4, 10);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x24);
+  return;
 }
 
 void rfid_get_work_mode(void)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  bVar2 = 0;
+  uVar3 = 0;
+  rfid_send_command((uint8_t *)0x9208, 2, 4, 6);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x24);
+  if ((bVar2 == 0x55) && (bVar1 == 0x41)) {
+    //FUN_00004264();
+  }
+  return;
 }
 
 void rfid_set_work_mode(byte *param_1)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  bVar2 = 0;
+  uVar3 = 0;
+  if (*param_1 < 0x3a) {
+    bVar1 = *param_1 - 0x30;
+  }
+  else if (*param_1 < 0x61) {
+    bVar1 = *param_1 - 0x37;
+  }
+  bVar2 = bVar1 * 0x10;
+  if (param_1[1] < 0x3a) {
+    bVar1 = param_1[1] - 0x30;
+  }
+  else if (param_1[1] < 0x61) {
+    bVar1 = param_1[1] - 0x37;
+  }
+  bVar2 = bVar2 + bVar1;
+  if (param_1[2] < 0x3a) {
+    bVar1 = param_1[2] - 0x30;
+  }
+  else if (param_1[2] < 0x61) {
+    bVar1 = param_1[2] - 0x37;
+  }
+  bVar2 = bVar2 + bVar1;
+  if (param_1[3] < 0x3a) {
+    bVar1 = param_1[3] - 0x30;
+  }
+  else if (param_1[3] < 0x61) {
+    bVar1 = param_1[3] - 0x37;
+  }
+  bVar2 = bVar2 + bVar1;
+  if (param_1[4] < 0x3a) {
+    bVar1 = param_1[4] - 0x30;
+  }
+  else if (param_1[4] < 0x61) {
+    bVar1 = param_1[4] - 0x37;
+  }
+
+  rfid_send_command((uint8_t *)0x9208, 3, 10, bVar2, bVar1);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x24);
+  return;
 }
 
 void rfid_get_buzzer_status(void)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  bVar2 = 0;
+  uVar3 = 0;
+  rfid_send_command((uint8_t *)0x9208, 2, 4, 2);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x24);
+  if ((bVar2 == 0x55) && (bVar1 == 0x41)) {
+    //FUN_00004264();
+  }
+  return;
 }
 
 void rfid_set_buzzer_status(byte *param_1)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  bVar2 = 0;
+  uVar3 = 0;
+  if (*param_1 < 0x3a) {
+    bVar1 = *param_1 - 0x30;
+  }
+  else if (*param_1 < 0x61) {
+    bVar1 = *param_1 - 0x37;
+  }
+  bVar2 = bVar1 * 0x10;
+  if (param_1[1] < 0x3a) {
+    bVar1 = param_1[1] - 0x30;
+  }
+  else if (param_1[1] < 0x61) {
+    bVar1 = param_1[1] - 0x37;
+  }
+  bVar2 = bVar2 + bVar1;
+
+  rfid_send_command((byte *)0x9208, 2, 6, bVar2);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x24);
+  return;
 }
 
 void rfid_stop_inventory(void)
 {
-    // This function is a placeholder for the refactored code.
+  rfid_send_command((byte *)0x5591, 2, 0, 0);
+  rfid_delay(100);
+  return;
 }
 
 void rfid_get_q_value(void)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  bVar2 = 0;
+  uVar3 = 0;
+  rfid_send_command((byte *)0x9200, 2, 4, 0);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x24);
+  if ((bVar2 == 0x55) && (bVar1 == 0x41)) {
+    //FUN_00004264();
+  }
+  return;
 }
 
 void rfid_set_q_value(byte *param_1)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  bVar2 = 0;
+  uVar3 = 0;
+  if (*param_1 < 0x3a) {
+    bVar1 = *param_1 - 0x30;
+  }
+  else if (*param_1 < 0x61) {
+    bVar1 = *param_1 - 0x37;
+  }
+  bVar2 = bVar1 * 0x10;
+  if (param_1[1] < 0x3a) {
+    bVar1 = param_1[1] - 0x30;
+  }
+  else if (param_1[1] < 0x61) {
+    bVar1 = param_1[1] - 0x37;
+  }
+  bVar2 = bVar2 + bVar1;
+
+  rfid_send_command((byte *)0x9200, 2, 6, bVar2);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x24);
+  return;
 }
 
 void rfid_get_session_target(void)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  bVar2 = 0;
+  uVar3 = 0;
+  rfid_send_command((byte *)0x9202, 2, 4, 0);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x24);
+  if ((bVar2 == 0x55) && (bVar1 == 0x41)) {
+    //FUN_00004264();
+  }
+  return;
 }
 
 void rfid_set_session_target(byte *param_1)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  bVar2 = 0;
+  uVar3 = 0;
+  if (*param_1 < 0x3a) {
+    bVar1 = *param_1 - 0x30;
+  }
+  else if (*param_1 < 0x61) {
+    bVar1 = *param_1 - 0x37;
+  }
+  bVar2 = bVar1 * 0x10;
+  if (param_1[1] < 0x3a) {
+    bVar1 = param_1[1] - 0x30;
+  }
+  else if (param_1[1] < 0x61) {
+    bVar1 = param_1[1] - 0x37;
+  }
+  bVar2 = bVar2 + bVar1;
+
+  rfid_send_command((byte *)0x9202, 2, 8, bVar2);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x24);
+  return;
 }
 
 void rfid_get_antenna_config(void)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  bVar2 = 0;
+  uVar3 = 0;
+  rfid_send_command((byte *)0x920e, 2, 4, 0);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x24);
+  if ((bVar2 == 0x55) && (bVar1 == 0x41)) {
+    //FUN_00004264();
+  }
+  return;
 }
 
 void rfid_set_antenna_config(byte *param_1)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  bVar2 = 0;
+  uVar3 = 0;
+  if (*param_1 < 0x3a) {
+    bVar1 = *param_1 - 0x30;
+  }
+  else if (*param_1 < 0x61) {
+    bVar1 = *param_1 - 0x37;
+  }
+  bVar2 = bVar1 * 0x10;
+  if (param_1[1] < 0x3a) {
+    bVar1 = param_1[1] - 0x30;
+  }
+  else if (param_1[1] < 0x61) {
+    bVar1 = param_1[1] - 0x37;
+  }
+  bVar2 = bVar2 + bVar1;
+
+  rfid_send_command((byte *)0x920e, 2, 8, bVar2);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x24);
+  return;
 }
 
 void rfid_get_baud_rate(void)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  bVar2 = 0;
+  uVar3 = 0;
+  rfid_send_command((byte *)0x9215, 2, 4, 0);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x24);
+  if ((bVar2 == 0x55) && (bVar1 == 0x41)) {
+    //FUN_00004264();
+  }
+  return;
 }
 
 void rfid_set_baud_rate(byte *param_1)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  bVar2 = 0;
+  uVar3 = 0;
+  if (*param_1 < 0x3a) {
+    bVar1 = *param_1 - 0x30;
+  }
+  else if (*param_1 < 0x61) {
+    bVar1 = *param_1 - 0x37;
+  }
+  bVar2 = bVar1 * 0x10;
+  if (param_1[1] < 0x3a) {
+    bVar1 = param_1[1] - 0x30;
+  }
+  else if (param_1[1] < 0x61) {
+    bVar1 = param_1[1] - 0x37;
+  }
+  bVar2 = bVar2 + bVar1;
+
+  rfid_send_command((byte *)0x9215, 2, 7, bVar2);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x24);
+  return;
 }
 
 void rfid_get_inventory_mode(void)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  bVar2 = 0;
+  uVar3 = 0;
+  rfid_send_command((byte *)0xa4, 2, 2, 0);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x24);
+  if ((bVar2 == 0x55) && (bVar1 == 0x41)) {
+    //FUN_00004264();
+  }
+  return;
 }
 
 void rfid_set_inventory_mode(byte *param_1)
 {
-    // This function is a placeholder for the refactored code.
+  byte bVar1;
+  byte bVar2;
+  uint32_t uVar3;
+
+  bVar1 = 0;
+  bVar2 = 0;
+  uVar3 = 0;
+  if (*param_1 < 0x3a) {
+    bVar1 = *param_1 - 0x30;
+  }
+  else if (*param_1 < 0x61) {
+    bVar1 = *param_1 - 0x37;
+  }
+  bVar2 = bVar1 * 0x10;
+  if (param_1[1] < 0x3a) {
+    bVar1 = param_1[1] - 0x30;
+  }
+  else if (param_1[1] < 0x61) {
+    bVar1 = param_1[1] - 0x37;
+  }
+  bVar2 = bVar2 + bVar1;
+
+  rfid_send_command((byte *)0xa4, 2, 0x13, bVar2);
+  rfid_delay(100);
+  rfid_read_response((byte *)&uVar3,0x24);
+  return;
 }
 
 uint16_t rfid_read_response(uint8_t *buffer, uint16_t length)
 {
-    // This is a placeholder for the real implementation.
-    return 0;
+    uint16_t i;
+    for (i = 0; i < length; i++)
+    {
+        if (uart_read(&buffer[i], 1) == 0)
+        {
+            return i;
+        }
+    }
+    return i;
 }
 
 bool rfid_has_data(void)
 {
     // This is a placeholder for the real implementation.
-    return false;
+    return uart_has_data();
 }
 
 void rfid_init(void)
 {
-    // This is a placeholder for the real implementation.
+  uart_init();
 }
 
 void rfid_process_command(byte *param_1)
@@ -194,7 +652,7 @@ void rfid_process_command(byte *param_1)
     uVar3 = (ushort)param_1[2] * 0x100 + (ushort)param_1[3];
   }
   if (uVar3 == 0x5580) {
-    rfid_get_reader_info();
+        rfid_get_reader_info(NULL);
     return;
   }
   if (uVar3 < 0x5581) {

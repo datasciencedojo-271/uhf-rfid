@@ -14,4 +14,12 @@ typedef struct {
     uint32_t device_version;
 } rfid_reader_info_t;
 
+typedef struct {
+    uint8_t state;
+    uint8_t flags;
+    uint16_t response_len;
+    uint8_t response_buf[256];
+    // ... other fields based on analysis
+} rfid_data_t;
+
 #endif // RFID_TYPES_H

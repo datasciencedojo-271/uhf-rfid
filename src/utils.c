@@ -74,3 +74,17 @@ int utils_memcmp(const void *s1, const void *s2, uint16_t length)
   }
   return 0;
 }
+
+/**
+ * @brief A simple busy-wait delay function.
+ * @param ms The delay in milliseconds.
+ */
+void utils_delay_ms(uint32_t ms)
+{
+    // This is a rough delay function. A more accurate delay function
+    // should be used in a real application, preferably using a hardware timer.
+    // The constant 1000 is a placeholder and should be calibrated for the target hardware.
+    for (volatile uint32_t i = 0; i < ms * 1000; i++) {
+        __asm__("nop");
+    }
+}

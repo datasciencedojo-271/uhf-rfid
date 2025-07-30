@@ -3,6 +3,41 @@
 #include "uart.h"
 #include "utils.h"
 #include "rcc.h"
+#include "string.h"
+#include "stubs.h"
+#include "memmap.h"
+
+
+void hw_send_command_and_wait(uint8_t cmd, uint8_t len, void* data)
+{
+    // This function is a C translation of FUN_0000531c.
+    // It is a generic command/response handler for the RFID module.
+
+    // The original function is a complex state machine that constructs a command packet,
+    // sends it over UART, and then waits for and parses the response.
+
+    // This is a simplified representation of the logic.
+    uint8_t command_buffer[256];
+    command_buffer[0] = 0xAA; // Start of packet
+    command_buffer[1] = 0xBB; // Start of packet
+    command_buffer[2] = cmd;
+    command_buffer[3] = len;
+    memcpy(&command_buffer[4], data, len);
+
+    // Calculate and append checksum
+    uint8_t checksum = 0;
+    for(int i=0; i<len+4; i++) {
+        checksum += command_buffer[i];
+    }
+    command_buffer[len+4] = checksum;
+
+    uart_write(command_buffer, len + 5);
+
+    // The original function has a complex state machine for waiting for the response.
+    // This is a simplified version.
+    uint8_t response_buffer[256];
+    rfid_read_response(response_buffer, sizeof(response_buffer));
+}
 #include "gpio.h"
 
 // Define the variable here
@@ -59,7 +94,7 @@ rfid_result_t rfid_get_reader_info(rfid_reader_info_t *info) {
     // A full reimplementation is done in rfid_process_data_packet.
 
     // These pointers are based on the analysis of FUN_00000cbc and its data structures.
-    volatile uint8_t* rfid_data_struct = (volatile uint8_t*)*(volatile uint32_t*)DAT_2000016C;
+    volatile uint8_t* rfid_data_struct = (volatile uint8_t*)(uintptr_t)*(volatile uint32_t*)DAT_2000016C;
     info->device_id = rfid_data_struct[0]; // Simplified
     info->device_version = rfid_data_struct[1]; // Simplified
 
@@ -70,7 +105,7 @@ rfid_result_t rfid_get_reader_info(rfid_reader_info_t *info) {
 // It's responsible for processing incoming data packets.
 void rfid_process_data_packet(void) {
     // 0xcc0: r0 = *(volatile uint32_t*)0x2000016c; (pointer to a struct)
-    volatile uint8_t* rfid_data_struct = (volatile uint8_t*)*(volatile uint32_t*)DAT_2000016C;
+    volatile uint8_t* rfid_data_struct = (volatile uint8_t*)(uintptr_t)*(volatile uint32_t*)DAT_2000016C;
 
     // 0xcc4: r5 = r0 + 0x10;
     volatile uint8_t* r5_ptr = rfid_data_struct + 0x10;
@@ -121,7 +156,7 @@ void rfid_process_data_packet(void) {
         // A series of function calls and data manipulation follows.
         // This is a simplified representation.
         void* some_buffer = (void*)FUN_00001480();
-        FUN_0000524c((void*)result, some_buffer, transfer_len);
+        FUN_0000524c((void*)(uintptr_t)result, some_buffer, transfer_len);
         FUN_000022e0(0, transfer_len);
 
         *(volatile uint16_t*)(r5_ptr + 0) -= transfer_len;
@@ -459,7 +494,7 @@ void rfid_get_work_mode(void)
     // Wait for a specific response
     for (int i = 0; i < 0x1000000; i++) {
         if (DAT_20000190 > 5) {
-            if (ADDR_2000029C[4] == 0x93 && ADDR_2000029C[5] == 0x38) {
+            if (DAT_2000029C[4] == 0x93 && DAT_2000029C[5] == 0x38) {
                 // Response received
                 break;
             }
@@ -878,7 +913,7 @@ bool rfid_has_data(void)
 void rfid_init(void)
 {
     // Enable clocks for GPIOA, GPIOC, and USART1
-    rcc_apb2_periph_clock_cmd(0x1 | 0x4 | 0x10, true); // AFIO, GPIOA, GPIOC
+    rcc_apb2_periph_clock_cmd(RCC_APB2ENR_AFIOEN | RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPEN, true);
     rcc_periph_clock_cmd(RCC_PERIPH_USART1, true);
 
     // Configure GPIO pins for UART

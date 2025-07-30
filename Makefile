@@ -23,7 +23,16 @@ CFLAGS = -Wall -O2 -g -I.
 SRCS = src/main.c \
        src/rfid.c \
        src/uart.c \
-       src/utils.c
+       src/utils.c \
+       src/stubs.c \
+       src/string.c \
+       src/iwdg.c \
+       src/nvic.c \
+       src/system.c \
+       src/systick.c \
+       src/rcc.c \
+       src/gpio.c \
+       src/wfi.s
 
 #
 # Build directory
@@ -33,7 +42,7 @@ BUILD_DIR = build
 #
 # Object files
 #
-OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/rfid.o $(BUILD_DIR)/uart.o $(BUILD_DIR)/utils.o
+OBJS = $(patsubst src/%.c, $(BUILD_DIR)/%.o, $(SRCS))
 
 #
 # Executable file
@@ -55,13 +64,16 @@ $(BUILD_DIR):
 # Link the executable
 #
 $(EXE): $(OBJS)
-	$(CC) -nostdlib -o $@ $(OBJS)
+	$(CC) -nostdlib -nostartfiles -nodefaultlibs -o $@ $(OBJS)
 
 #
 # Compile the source files
 #
 $(BUILD_DIR)/%.o: src/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(BUILD_DIR)/%.o: src/%.s
+	$(AS) -o $@ $<
 
 #
 # Clean the project

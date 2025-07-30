@@ -3,6 +3,11 @@
 #include "uart.h"
 #include "rfid.h"
 #include "gpio.h"
+#include "iwdg.h"
+#include "nvic.h"
+#include "system.h"
+#include "systick.h"
+#include "string.h"
 #include "memmap.h"
 #include "stubs.h"
 
@@ -19,13 +24,12 @@ void main_loop_body(void) {
     uint32_t local_stack_vars_1[4];
     uint32_t local_stack_vars_2[4];
 
-    static uint32_t r9_counter = 0; // This register is used as a persistent counter
-
+    iwdg_reload_counter();
     // 0x2c92 - 0x2cae: Zero out local stack buffers
-    FUN_000003ba(local_buf_bc, sizeof(local_buf_bc));
-    FUN_000003ba(local_buf_88, sizeof(local_buf_88));
-    FUN_000003ba(local_buf_54, sizeof(local_buf_54));
-    FUN_000003ba(local_buf_20, sizeof(local_buf_20));
+    memset(local_buf_bc, 0, sizeof(local_buf_bc));
+    memset(local_buf_88, 0, sizeof(local_buf_88));
+    memset(local_buf_54, 0, sizeof(local_buf_54));
+    memset(local_buf_20, 0, sizeof(local_buf_20));
 
     // 0x2cb2 - 0x2cce: Load data from flash into stack variables.
     // These are likely configuration constants or tables.

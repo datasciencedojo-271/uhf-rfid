@@ -12,6 +12,11 @@
 #define RCC_PERIPH_GPIOA 0x40010800
 #define RCC_PERIPH_GPIOC 0x40011000
 
+#define RCC_APB2ENR_AFIOEN (1 << 0)
+#define RCC_APB2ENR_IOPAEN (1 << 2)
+#define RCC_APB2ENR_IOPEN (1 << 4)
+
 void rcc_periph_clock_cmd(uint32_t periph_base, bool enable);
+void rcc_apb2_periph_clock_cmd(uint32_t periph, bool enable);
 
 #endif // RCC_H

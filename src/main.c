@@ -15,7 +15,10 @@ void handle_rfid_response(void);
 void process_rfid_data(void);
 void send_response_to_host(void);
 
-// Main loop
+/**
+ * @brief Main loop.
+ * @note This function corresponds to the main loop in FUN_00002c8c in the firmware (lines 9424-10650).
+ */
 void main_loop(void)
 {
     if (uart_has_data()) {
@@ -31,7 +34,10 @@ void main_loop(void)
     send_response_to_host();
 }
 
-// Main function
+/**
+ * @brief Main function.
+ * @note This function corresponds to the Entry Point in the firmware.
+ */
 int main(void)
 {
     uart_init();
@@ -42,6 +48,10 @@ int main(void)
     }
 }
 
+/**
+ * @brief Handle a command from the host.
+ * @note This function is a part of the main loop in FUN_00002c8c in the firmware.
+ */
 void handle_host_command(void)
 {
     uint8_t command_length;
@@ -55,6 +65,10 @@ void handle_host_command(void)
     }
 }
 
+/**
+ * @brief Handle a response from the RFID module.
+ * @note This function is a part of the main loop in FUN_00002c8c in the firmware.
+ */
 void handle_rfid_response(void)
 {
     uint8_t response_length;
@@ -68,6 +82,10 @@ void handle_rfid_response(void)
     }
 }
 
+/**
+ * @brief Process data from the RFID module.
+ * @note This function is a part of the main loop in FUN_00002c8c in the firmware.
+ */
 void process_rfid_data(void)
 {
     // This function will be implemented in a future step.
@@ -77,6 +95,10 @@ void process_rfid_data(void)
     }
 }
 
+/**
+ * @brief Send a response to the host.
+ * @note This function is a part of the main loop in FUN_00002c8c in the firmware.
+ */
 void send_response_to_host(void)
 {
     // This function will be implemented in a future step.

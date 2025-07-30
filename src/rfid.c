@@ -55,7 +55,7 @@ void watchdog_reset(void)
  * @brief Get the reader info.
  * @param info Pointer to the rfid_reader_info_t struct to store the reader info.
  * @return RFID_RESULT_OK on success, RFID_RESULT_INVALID_PARAM if info is NULL.
- * @note This function corresponds to FUN_00000cbc in the firmware.
+ * @note This function corresponds to FUN_00000cbc in the firmware (lines 1157-1234).
  */
 rfid_result_t rfid_get_reader_info(rfid_reader_info_t *info)
 {
@@ -67,15 +67,16 @@ rfid_result_t rfid_get_reader_info(rfid_reader_info_t *info)
     // This is a simplified version of the logic in FUN_00000cbc.
     // The original function is much more complex and involves a state machine.
     // For now, we will just read the device ID and version from memory.
-    info->device_id = *(uint32_t *)0x2000016c;
-    info->device_version = *(uint32_t *)0x20000170;
+    // These addresses are derived from the LDR instructions in FUN_00000cbc.
+    info->device_id = *(uint32_t *)0x2000016c; // DAT_00000d64
+    info->device_version = *(uint32_t *)0x20000170; // DAT_00000d70
 
     return RFID_RESULT_OK;
 }
 
 /**
  * @brief Get the frequency hopping status.
- * @note This function corresponds to FUN_00003d44 in the firmware.
+ * @note This function corresponds to FUN_00003d44 in the firmware (lines 1236-1262).
  */
 void rfid_get_freq_hopping(void)
 {
@@ -94,7 +95,7 @@ void rfid_get_freq_hopping(void)
 /**
  * @brief Set the frequency hopping.
  * @param param_1 The frequency hopping parameter.
- * @note This function corresponds to FUN_000049e8 in the firmware.
+ * @note This function corresponds to FUN_000049e8 in the firmware (lines 1734-1784).
  */
 void rfid_set_freq_hopping(byte *param_1)
 {
@@ -131,7 +132,7 @@ void rfid_set_freq_hopping(byte *param_1)
 
 /**
  * @brief Get the antenna power.
- * @note This function corresponds to FUN_00003cc0 in the firmware.
+ * @note This function corresponds to FUN_00003cc0 in the firmware (lines 1157-1234).
  */
 void rfid_get_antenna_power(void)
 {
@@ -151,7 +152,7 @@ void rfid_get_antenna_power(void)
 /**
  * @brief Set the antenna power.
  * @param param_1 The antenna power.
- * @note This function corresponds to FUN_00004928 in the firmware.
+ * @note This function corresponds to FUN_00004928 in the firmware (lines 1734-1784).
  */
 void rfid_set_antenna_power(byte param_1)
 {
@@ -177,7 +178,7 @@ void rfid_set_antenna_power(byte param_1)
 /**
  * @brief Set the GPIO status.
  * @param param_1 The GPIO parameter.
- * @note This function corresponds to FUN_0000350c in the firmware.
+ * @note This function corresponds to FUN_0000350c in the firmware (lines 1264-1322).
  */
 void rfid_set_gpio(byte *param_1)
 {
@@ -188,7 +189,7 @@ void rfid_set_gpio(byte *param_1)
 
 /**
  * @brief Get the firmware version.
- * @note This function corresponds to FUN_00003e00 in the firmware.
+ * @note This function corresponds to FUN_00003e00 in the firmware (lines 1324-1352).
  */
 void rfid_get_firmware_version(void)
 {
@@ -210,7 +211,7 @@ void rfid_get_firmware_version(void)
  * @param param_1 The first parameter.
  * @param param_2 The second parameter.
  * @param param_3 The third parameter.
- * @note This function corresponds to FUN_00003fa0 in the firmware.
+ * @note This function corresponds to FUN_00003fa0 in the firmware (lines 1354-1486).
  */
 void rfid_inventory(byte param_1, byte param_2, byte param_3)
 {
@@ -259,7 +260,7 @@ void rfid_inventory(byte param_1, byte param_2, byte param_3)
  * @param param_2 The second parameter.
  * @param param_3 The third parameter.
  * @param param_4 The fourth parameter.
- * @note This function corresponds to FUN_00004af0 in the firmware.
+ * @note This function corresponds to FUN_00004af0 in the firmware (lines 1488-1634).
  */
 void rfid_read_tag(byte param_1, byte param_2, byte param_3, byte *param_4)
 {
@@ -306,7 +307,7 @@ void rfid_read_tag(byte param_1, byte param_2, byte param_3, byte *param_4)
 
 /**
  * @brief Get the work mode.
- * @note This function corresponds to FUN_00003888 in the firmware.
+ * @note This function corresponds to FUN_00003888 in the firmware (lines 1636-1678).
  */
 void rfid_get_work_mode(void)
 {
@@ -326,7 +327,7 @@ void rfid_get_work_mode(void)
 /**
  * @brief Set the work mode.
  * @param param_1 The work mode parameter.
- * @note This function corresponds to FUN_00004264 in the firmware.
+ * @note This function corresponds to FUN_00004264 in the firmware (lines 1680-1732).
  */
 void rfid_set_work_mode(byte *param_1)
 {
@@ -390,7 +391,7 @@ void rfid_set_work_mode(byte *param_1)
 
 /**
  * @brief Get the buzzer status.
- * @note This function corresponds to FUN_00003b00 in the firmware.
+ * @note This function corresponds to FUN_00003b00 in the firmware (lines 1786-1814).
  */
 void rfid_get_buzzer_status(void)
 {
@@ -410,7 +411,7 @@ void rfid_get_buzzer_status(void)
 /**
  * @brief Set the buzzer status.
  * @param param_1 The buzzer status parameter.
- * @note This function corresponds to FUN_00004828 in the firmware.
+ * @note This function corresponds to FUN_00004828 in the firmware (lines 1816-1860).
  */
 void rfid_set_buzzer_status(byte *param_1)
 {
@@ -448,7 +449,7 @@ void rfid_set_buzzer_status(byte *param_1)
 
 /**
  * @brief Stop the inventory.
- * @note This function corresponds to FUN_00003a6c in the firmware.
+ * @note This function corresponds to FUN_00003a6c in the firmware (lines 1862-1926).
  */
 void rfid_stop_inventory(void)
 {
@@ -459,7 +460,7 @@ void rfid_stop_inventory(void)
 
 /**
  * @brief Get the Q value.
- * @note This function corresponds to FUN_00003b50 in the firmware.
+ * @note This function corresponds to FUN_00003b50 in the firmware (lines 1928-1982).
  */
 void rfid_get_q_value(void)
 {
@@ -479,7 +480,7 @@ void rfid_get_q_value(void)
 /**
  * @brief Set the Q value.
  * @param param_1 The Q value parameter.
- * @note This function corresponds to FUN_000043d0 in the firmware.
+ * @note This function corresponds to FUN_000043d0 in the firmware (lines 1984-2042).
  */
 void rfid_set_q_value(byte *param_1)
 {
@@ -517,7 +518,7 @@ void rfid_set_q_value(byte *param_1)
 
 /**
  * @brief Get the session target.
- * @note This function corresponds to FUN_00003984 in the firmware.
+ * @note This function corresponds to FUN_00003984 in the firmware (lines 2044-2098).
  */
 void rfid_get_session_target(void)
 {
@@ -537,7 +538,7 @@ void rfid_get_session_target(void)
 /**
  * @brief Set the session target.
  * @param param_1 The session target parameter.
- * @note This function corresponds to FUN_0000448c in the firmware.
+ * @note This function corresponds to FUN_0000448c in the firmware (lines 2100-2154).
  */
 void rfid_set_session_target(byte *param_1)
 {
@@ -575,7 +576,7 @@ void rfid_set_session_target(byte *param_1)
 
 /**
  * @brief Get the antenna config.
- * @note This function corresponds to FUN_000039e4 in the firmware.
+ * @note This function corresponds to FUN_000039e4 in the firmware (lines 2156-2210).
  */
 void rfid_get_antenna_config(void)
 {
@@ -595,7 +596,7 @@ void rfid_get_antenna_config(void)
 /**
  * @brief Set the antenna config.
  * @param param_1 The antenna config parameter.
- * @note This function corresponds to FUN_00004504 in the firmware.
+ * @note This function corresponds to FUN_00004504 in the firmware (lines 2212-2268).
  */
 void rfid_set_antenna_config(byte *param_1)
 {
@@ -633,7 +634,7 @@ void rfid_set_antenna_config(byte *param_1)
 
 /**
  * @brief Get the baud rate.
- * @note This function corresponds to FUN_00003a24 in the firmware.
+ * @note This function corresponds to FUN_00003a24 in the firmware (lines 2270-2300).
  */
 void rfid_get_baud_rate(void)
 {
@@ -653,7 +654,7 @@ void rfid_get_baud_rate(void)
 /**
  * @brief Set the baud rate.
  * @param param_1 The baud rate parameter.
- * @note This function corresponds to FUN_000047c0 in the firmware.
+ * @note This function corresponds to FUN_000047c0 in the firmware (lines 2302-2354).
  */
 void rfid_set_baud_rate(byte *param_1)
 {
@@ -691,7 +692,7 @@ void rfid_set_baud_rate(byte *param_1)
 
 /**
  * @brief Get the inventory mode.
- * @note This function corresponds to FUN_00003be0 in the firmware.
+ * @note This function corresponds to FUN_00003be0 in the firmware (lines 2356-2412).
  */
 void rfid_get_inventory_mode(void)
 {
@@ -711,7 +712,7 @@ void rfid_get_inventory_mode(void)
 /**
  * @brief Set the inventory mode.
  * @param param_1 The inventory mode parameter.
- * @note This function corresponds to FUN_000046a4 in the firmware.
+ * @note This function corresponds to FUN_000046a4 in the firmware (lines 2414-2468).
  */
 void rfid_set_inventory_mode(byte *param_1)
 {

@@ -18,7 +18,7 @@ The command packet has the following format:
 
 ### Response Packet
 
-The response packet format is not fully understood, but it is assumed to be similar to the command packet format. It likely contains a header, a status code, a length, data, and a checksum.
+The response packet format is not fully understood. The firmware seems to use a state machine to parse the responses, and the exact format is not clearly defined in the C code. It is assumed to be similar to the command packet format, likely containing a header, a status code, a length, data, and a checksum. A more in-depth analysis of the firmware disassembly would be required to fully understand the response format.
 
 ## Commands
 

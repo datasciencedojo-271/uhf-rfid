@@ -1,5 +1,12 @@
 #include "utils.h"
 
+/**
+ * @brief Calculate the checksum of a byte array.
+ * @param data The data to calculate the checksum of.
+ * @param length The length of the data.
+ * @return The checksum.
+ * @note This function corresponds to FUN_000008c0 in the firmware (lines 923-941).
+ */
 uint8_t utils_checksum(uint8_t *data, uint16_t length)
 {
   uint8_t checksum = 0;
@@ -9,6 +16,13 @@ uint8_t utils_checksum(uint8_t *data, uint16_t length)
   return ~checksum + 1;
 }
 
+/**
+ * @brief Copy memory.
+ * @param dst The destination.
+ * @param src The source.
+ * @param length The length to copy.
+ * @note This function corresponds to FUN_00000288 in the firmware (lines 288-374).
+ */
 void utils_memcpy(void *dst, const void *src, uint16_t length)
 {
   uint8_t *d = (uint8_t *)dst;
@@ -18,6 +32,13 @@ void utils_memcpy(void *dst, const void *src, uint16_t length)
   }
 }
 
+/**
+ * @brief Fill memory with a value.
+ * @param dst The destination.
+ * @param value The value to fill with.
+ * @param length The length to fill.
+ * @note This function corresponds to FUN_00000376 in the firmware (lines 376-476).
+ */
 void utils_memset(void *dst, uint8_t value, uint16_t length)
 {
   uint8_t *d = (uint8_t *)dst;
@@ -26,6 +47,14 @@ void utils_memset(void *dst, uint8_t value, uint16_t length)
   }
 }
 
+/**
+ * @brief Compare two memory regions.
+ * @param s1 The first memory region.
+ * @param s2 The second memory region.
+ * @param length The length to compare.
+ * @return 0 if the memory regions are equal, -1 if s1 < s2, 1 if s1 > s2.
+ * @note This function corresponds to FUN_00000230 in the firmware (lines 230-286).
+ */
 int utils_memcmp(const void *s1, const void *s2, uint16_t length)
 {
   const uint8_t *p1 = (const uint8_t *)s1;

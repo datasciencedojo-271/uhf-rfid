@@ -15,7 +15,7 @@ OD = arm-none-eabi-objdump
 #
 # C flags
 #
-CFLAGS = -Wall -O2 -g -mcpu=cortex-m3 -mthumb -I. -nostdlib -ffreestanding
+CFLAGS = -Wall -O2 -g -I.
 
 #
 # Source files

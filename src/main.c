@@ -1,12 +1,6 @@
-// #include <string.h>
 #include "main.h"
-#include "uart.h"
-#include "rfid.h"
 #include "gpio.h"
 #include "iwdg.h"
-#include "nvic.h"
-#include "system.h"
-#include "systick.h"
 #include "string.h"
 #include "memmap.h"
 #include "stubs.h"

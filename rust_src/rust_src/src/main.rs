@@ -1,108 +1,53 @@
 #![no_std]
 #![no_main]
 
-use core::panic::PanicInfo;
+use cortex_m_rt::entry;
+use panic_halt as _;
+use stm32f1xx_hal::{pac, prelude::*};
 
-mod gpio;
 mod iwdg;
-mod memmap;
-mod nvic;
-mod rcc;
 mod rfid;
-mod systick;
 mod uart;
-mod utils;
 
-#[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    loop {}
-}
+#[entry]
+fn main() -> ! {
+    // Get access to the core peripherals from the cortex-m crate
+    let cp = cortex_m::peripheral::Peripherals::take().unwrap();
+    // Get access to the device specific peripherals from the peripheral access crate
+    let dp = pac::Peripherals::take().unwrap();
 
-fn main_loop_body() {
-    // These buffers are located on the stack in the original firmware.
-    // They are used for temporary storage during command processing.
-    let mut local_buf_bc: [u8; 52] = [0; 52];
-    let mut local_buf_88: [u8; 52] = [0; 52];
-    let mut local_buf_54: [u8; 52] = [0; 52];
-    let mut local_buf_20: [u8; 52] = [0; 52];
+    // Take ownership over the raw flash and rcc devices and convert them into the corresponding HAL structs
+    let mut flash = dp.FLASH.constrain();
+    let rcc = dp.RCC.constrain();
 
-    let mut local_stack_vars_1: [u32; 4] = [0; 4];
-    let mut local_stack_vars_2: [u32; 4] = [0; 4];
+    // Freeze the configuration of all the clocks in the system and store the frozen frequencies in
+    // `clocks`
+    let clocks = rcc.cfgr.freeze(&mut flash.acr);
 
-    iwdg::iwdg_reload_counter();
+    // Acquire the GPIOA peripheral
+    let mut gpioa = dp.GPIOA.split();
 
-    // Zero out local stack buffers
-    local_buf_bc.iter_mut().for_each(|m| *m = 0);
-    local_buf_88.iter_mut().for_each(|m| *m = 0);
-    local_buf_54.iter_mut().for_each(|m| *m = 0);
-    local_buf_20.iter_mut().for_each(|m| *m = 0);
+    // Configure the systick timer for a 1ms interrupt and obtain the delay provider
+    let mut delay = cp.SYST.delay(&clocks);
 
-    // Load data from flash into stack variables.
-    // These are likely configuration constants or tables.
-    unsafe {
-        core::ptr::copy_nonoverlapping(
-            memmap::DAT_08009308 as *const u32,
-            local_stack_vars_1.as_mut_ptr(),
-            4,
-        );
-        core::ptr::copy_nonoverlapping(
-            memmap::DAT_08003090 as *const u32,
-            local_stack_vars_2.as_mut_ptr(),
-            4,
-        );
-    }
+    // Configure the UART
+    let tx = gpioa.pa9.into_alternate_push_pull(&mut gpioa.crh);
+    let rx = gpioa.pa10;
+    let mut uart = uart::Uart::new(dp.USART1, tx, rx, &mut dp.AFIO.constrain(), &clocks);
 
-    // Initialize a buffer at DAT_20000027 with 8 zeros
-    for i in 0..8 {
-        unsafe {
-            core::ptr::write_volatile(memmap::DAT_20000027.add(i), 0);
-        }
-    }
+    // Configure the independent watchdog
+    let mut iwdg = iwdg::Iwdg::new(dp.IWDG);
 
-    // -- Main Loop Logic --
-    // Check if there are any commands to process. If not, exit.
-    unsafe {
-        if core::ptr::read_volatile(memmap::DAT_200001B9) == 0
-            && core::ptr::read_volatile(memmap::DAT_200001C0) == 0
-        {
-            return;
-        }
-
-        // Main state machine based on the value of DAT_200001B9
-        if core::ptr::read_volatile(memmap::DAT_200001B9) != 0 {
-            // State machine for when DAT_200001B9 is non-zero.
-            // This is a complex set of nested conditions and function calls.
-
-            // This is a simplified representation of the logic.
-            // A full translation would require a more detailed analysis of each branch.
-            if core::ptr::read_volatile(memmap::DAT_20000190) > 0x17 {
-                // ...
-            } else if core::ptr::read_volatile(memmap::DAT_20000190) > 0x23 {
-                // ...
-            }
-        } else if core::ptr::read_volatile(memmap::DAT_200001C0) != 0 {
-            // This block corresponds to logic starting at 0x2e94
-            if core::ptr::read_volatile(memmap::DAT_200001C0) == 0 {
-                // This path is not taken if DAT_200001C0 is zero.
-            } else {
-                // 0x2ea8
-                if core::ptr::read_volatile(memmap::DAT_200001C3) == 0 {
-                    if core::ptr::read_volatile(memmap::DAT_200001AE) != 0 {
-                        // ...
-                    }
-                } else {
-                    // ...
-                }
-            }
-        }
-    }
-}
-
-#[no_mangle]
-pub extern "C" fn main() -> ! {
-    rfid::rfid_init();
+    // Create an RFID instance
+    let mut rfid = rfid::Rfid::new(&mut uart, &mut delay);
 
     loop {
-        main_loop_body();
+        main_loop_body(&mut rfid, &mut iwdg);
     }
+}
+
+fn main_loop_body(rfid: &mut rfid::Rfid, iwdg: &mut iwdg::Iwdg) {
+    iwdg.feed();
+
+    // The rest of this function would be implemented here, using the safe rfid object.
 }

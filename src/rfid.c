@@ -7,7 +7,6 @@
 #include "stubs.h"
 #include "memmap.h"
 
-
 void hw_send_command_and_wait(uint8_t cmd, uint8_t len, void* data)
 {
     // This function is a C translation of FUN_0000531c.

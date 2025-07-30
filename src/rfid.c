@@ -70,7 +70,6 @@ rfid_result_t rfid_get_reader_info(rfid_reader_info_t *info)
     // These addresses are derived from the LDR instructions in FUN_00000cbc.
     info->device_id = *(uint32_t *)0x2000016c; // DAT_00000d64
     info->device_version = *(uint32_t *)0x20000170; // DAT_00000d70
-
     return RFID_RESULT_OK;
 }
 
@@ -773,6 +772,20 @@ bool rfid_has_data(void)
 void rfid_init(void)
 {
   uart_init();
+//   uart_init(115200);
+  // The following is a reverse engineering of FUN_00005a44
+  // It is not complete, but it is a start.
+//   byte local_18 [24];
+//   FUN_00001d84(0x4004, 1);
+//   FUN_00004d10(0x40013800);
+//   *(uint16_t *)(local_18 + 0x14) = 0x200;
+//   *(uint8_t *)(local_18 + 0x16) = 3;
+//   *(uint8_t *)(local_18 + 0x17) = 0x18;
+//   FUN_000012b6(0x40010800, local_18 + 0x14);
+//   *(uint16_t *)(local_18 + 0x14) = 0x400;
+//   *(uint8_t *)(local_18 + 0x17) = 0x48;
+//   FUN_000012b6(0x40010800, local_18 + 0x14);
+  // ...
 }
 
 // Corresponds to FUN_00003614 in fw.lst

@@ -1,4 +1,4 @@
-#include <string.h>
+// #include <string.h>
 #include "main.h"
 #include "uart.h"
 #include "rfid.h"

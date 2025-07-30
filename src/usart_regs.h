@@ -1,7 +1,7 @@
 #ifndef USART_REGS_H
 #define USART_REGS_H
 
-#include <stdint.h>
+#include "stdint.h"
 
 #define USART1_BASE 0x40013800
 #define USART1 ((USART_TypeDef *) USART1_BASE)

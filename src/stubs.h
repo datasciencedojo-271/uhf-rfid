@@ -1,7 +1,7 @@
 #ifndef STUBS_H
 #define STUBS_H
 
-#include <stdint.h>
+#include "stdint.h"
 #include <stddef.h>
 
 void FUN_00005a40(void);

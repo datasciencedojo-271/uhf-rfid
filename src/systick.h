@@ -1,7 +1,7 @@
 #ifndef SYSTICK_H
 #define SYSTICK_H
 
-#include <stdint.h>
+#include "stdint.h"
 
 void systick_init(void);
 void systick_delay(uint32_t ms);

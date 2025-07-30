@@ -1,7 +1,7 @@
 #ifndef NVIC_TYPES_H
 #define NVIC_TYPES_H
 
-#include <stdint.h>
+#include "stdint.h"
 
 typedef struct {
     volatile uint32_t ISER[8];

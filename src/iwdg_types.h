@@ -1,7 +1,7 @@
 #ifndef IWDG_TYPES_H
 #define IWDG_TYPES_H
 
-#include <stdint.h>
+#include "stdint.h"
 
 typedef struct {
     volatile uint32_t KR;

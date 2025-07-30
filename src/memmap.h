@@ -1,7 +1,7 @@
 #ifndef MEMMAP_H
 #define MEMMAP_H
 
-#include <stdint.h>
+#include "stdint.h"
 #include "iwdg_types.h"
 #include "nvic_types.h"
 #include "system_types.h"

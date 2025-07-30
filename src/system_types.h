@@ -1,7 +1,7 @@
 #ifndef SYSTEM_TYPES_H
 #define SYSTEM_TYPES_H
 
-#include <stdint.h>
+#include "stdint.h"
 
 typedef struct {
     volatile uint32_t CPUID;

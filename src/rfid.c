@@ -7,6 +7,9 @@
 // Define the variable here
 uint DAT_00003884;
 
+// This function is a rough implementation of a delay.
+// It is not a direct translation of any function in fw.lst, but it
+// is used by many functions that are.
 void rfid_delay(uint16_t milliseconds)
 {
   // This is a rough delay function. A more accurate delay function
@@ -16,6 +19,7 @@ void rfid_delay(uint16_t milliseconds)
   }
 }
 
+// This function is a helper and does not directly correspond to a function in fw.lst
 uint8_t rfid_get_response(uint8_t command)
 {
   uint8_t response;
@@ -26,6 +30,7 @@ uint8_t rfid_get_response(uint8_t command)
 
 #include <stdarg.h>
 
+// This function is a helper and does not directly correspond to a function in fw.lst
 void rfid_send_command(uint8_t *command, uint16_t length, ...)
 {
   va_list args;
@@ -40,11 +45,13 @@ void rfid_send_command(uint8_t *command, uint16_t length, ...)
   va_end(args);
 }
 
+// Corresponds to FUN_00005a44 in a simplified form
 void watchdog_reset(void)
 {
   // This is a placeholder for the watchdog reset function.
 }
 
+// Corresponds to FUN_00003cc0 in fw.lst
 rfid_result_t rfid_get_reader_info(rfid_reader_info_t *info)
 {
     if (info == NULL)
@@ -60,6 +67,7 @@ rfid_result_t rfid_get_reader_info(rfid_reader_info_t *info)
     return RFID_RESULT_OK;
 }
 
+// Corresponds to FUN_00003d44 in fw.lst
 void rfid_get_freq_hopping(void)
 {
   byte bVar1;
@@ -78,6 +86,7 @@ void rfid_get_freq_hopping(void)
   return;
 }
 
+// Corresponds to FUN_000049e8 in fw.lst
 void rfid_set_freq_hopping(byte *param_1)
 {
   byte bVar1;
@@ -107,6 +116,7 @@ void rfid_set_freq_hopping(byte *param_1)
   return;
 }
 
+// Corresponds to FUN_00003cc0 in fw.lst
 void rfid_get_antenna_power(void)
 {
   byte bVar1;
@@ -125,6 +135,7 @@ void rfid_get_antenna_power(void)
   return;
 }
 
+// Corresponds to FUN_00004928 in fw.lst
 void rfid_set_antenna_power(byte param_1)
 {
   byte bVar1;
@@ -144,6 +155,7 @@ void rfid_set_antenna_power(byte param_1)
   return;
 }
 
+// Corresponds to FUN_0000350c in fw.lst
 void rfid_set_gpio(byte *param_1)
 {
   rfid_send_command((uint8_t *)0x91, 2, param_1[0], param_1[1]);
@@ -151,6 +163,7 @@ void rfid_set_gpio(byte *param_1)
   // ... read response ...
 }
 
+// Corresponds to FUN_00003e00 in fw.lst
 void rfid_get_firmware_version(void)
 {
   byte bVar1;
@@ -169,6 +182,7 @@ void rfid_get_firmware_version(void)
   return;
 }
 
+// Corresponds to FUN_00003fa0 in fw.lst
 void rfid_inventory(byte param_1, byte param_2, byte param_3)
 {
   byte bVar1;
@@ -204,6 +218,7 @@ void rfid_inventory(byte param_1, byte param_2, byte param_3)
   return;
 }
 
+// Corresponds to FUN_00004af0 in fw.lst
 void rfid_read_tag(byte param_1, byte param_2, byte param_3, byte *param_4)
 {
   byte bVar1;
@@ -241,6 +256,7 @@ void rfid_read_tag(byte param_1, byte param_2, byte param_3, byte *param_4)
   return;
 }
 
+// Corresponds to FUN_00003888 in fw.lst
 void rfid_get_work_mode(void)
 {
   byte bVar1;
@@ -259,6 +275,7 @@ void rfid_get_work_mode(void)
   return;
 }
 
+// Corresponds to FUN_00004264 in fw.lst
 void rfid_set_work_mode(byte *param_1)
 {
   byte bVar1;
@@ -309,6 +326,7 @@ void rfid_set_work_mode(byte *param_1)
   return;
 }
 
+// Corresponds to FUN_00003b00 in fw.lst
 void rfid_get_buzzer_status(void)
 {
   byte bVar1;
@@ -327,6 +345,7 @@ void rfid_get_buzzer_status(void)
   return;
 }
 
+// Corresponds to FUN_00004828 in fw.lst
 void rfid_set_buzzer_status(byte *param_1)
 {
   byte bVar1;
@@ -357,6 +376,7 @@ void rfid_set_buzzer_status(byte *param_1)
   return;
 }
 
+// Corresponds to FUN_00003a6c in fw.lst
 void rfid_stop_inventory(void)
 {
   rfid_send_command((byte *)0x5591, 2, 0, 0);
@@ -364,6 +384,7 @@ void rfid_stop_inventory(void)
   return;
 }
 
+// Corresponds to FUN_00003b50 in fw.lst
 void rfid_get_q_value(void)
 {
   byte bVar1;
@@ -382,6 +403,7 @@ void rfid_get_q_value(void)
   return;
 }
 
+// Corresponds to FUN_000043d0 in fw.lst
 void rfid_set_q_value(byte *param_1)
 {
   byte bVar1;
@@ -412,6 +434,7 @@ void rfid_set_q_value(byte *param_1)
   return;
 }
 
+// Corresponds to FUN_00003984 in fw.lst
 void rfid_get_session_target(void)
 {
   byte bVar1;
@@ -430,6 +453,7 @@ void rfid_get_session_target(void)
   return;
 }
 
+// Corresponds to FUN_0000448c in fw.lst
 void rfid_set_session_target(byte *param_1)
 {
   byte bVar1;
@@ -460,6 +484,7 @@ void rfid_set_session_target(byte *param_1)
   return;
 }
 
+// Corresponds to FUN_000039e4 in fw.lst
 void rfid_get_antenna_config(void)
 {
   byte bVar1;
@@ -478,6 +503,7 @@ void rfid_get_antenna_config(void)
   return;
 }
 
+// Corresponds to FUN_00004504 in fw.lst
 void rfid_set_antenna_config(byte *param_1)
 {
   byte bVar1;
@@ -508,6 +534,7 @@ void rfid_set_antenna_config(byte *param_1)
   return;
 }
 
+// Corresponds to FUN_00003a24 in fw.lst
 void rfid_get_baud_rate(void)
 {
   byte bVar1;
@@ -526,6 +553,7 @@ void rfid_get_baud_rate(void)
   return;
 }
 
+// Corresponds to FUN_000047c0 in fw.lst
 void rfid_set_baud_rate(byte *param_1)
 {
   byte bVar1;
@@ -556,6 +584,7 @@ void rfid_set_baud_rate(byte *param_1)
   return;
 }
 
+// Corresponds to FUN_00003be0 in fw.lst
 void rfid_get_inventory_mode(void)
 {
   byte bVar1;
@@ -574,6 +603,7 @@ void rfid_get_inventory_mode(void)
   return;
 }
 
+// Corresponds to FUN_000046a4 in fw.lst
 void rfid_set_inventory_mode(byte *param_1)
 {
   byte bVar1;
@@ -604,6 +634,7 @@ void rfid_set_inventory_mode(byte *param_1)
   return;
 }
 
+// This function is a helper and does not directly correspond to a function in fw.lst
 uint16_t rfid_read_response(uint8_t *buffer, uint16_t length)
 {
     uint16_t i;
@@ -617,17 +648,20 @@ uint16_t rfid_read_response(uint8_t *buffer, uint16_t length)
     return i;
 }
 
+// This function is a helper and does not directly correspond to a function in fw.lst
 bool rfid_has_data(void)
 {
     // This is a placeholder for the real implementation.
     return uart_has_data();
 }
 
+// Corresponds to FUN_00005a44 in fw.lst
 void rfid_init(void)
 {
   uart_init();
 }
 
+// Corresponds to FUN_00003614 in fw.lst
 void rfid_process_command(byte *param_1)
 {
   char cVar1;

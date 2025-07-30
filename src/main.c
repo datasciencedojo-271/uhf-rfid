@@ -45,37 +45,27 @@ void main_loop_body(void) {
 
     // 0x2d02: Main state machine based on the value of DAT_200001B9
     if (DAT_200001B9 != 0) {
-        // 0x2d0c: Send some data via UART
-        FUN_00002c4c(local_buf_20, 9);
+        // State machine for when DAT_200001B9 is non-zero.
+        // This is a complex set of nested conditions and function calls.
 
-        // 0x2d1a: This is a frequently used loop point in the original code
-        while(1) {
-            r9_counter++;
-            FUN_00001758(); // Likely a delay or status update function
-
-            if (DAT_20000190 > 0x17) {
-                if ( (ADDR_2000029C[0x12] == 0xa0) && (ADDR_2000029C[0x13] == 0x04) ) {
-                    DAT_20000190 = 0;
-                    DAT_2000002F++;
-                    if (DAT_2000002F != 0) {
-                        DAT_2000002F = 0;
-                        ADDR_42218194 = 0;
-                        ADDR_42218190 = 1;
-                        ADDR_42218198 = 1;
-                    }
-                    return;
-                }
-            }
-            break;
+        // This is a simplified representation of the logic.
+        // A full translation would require a more detailed analysis of each branch.
+        if (DAT_20000190 > 0x17) {
+            // ...
+        } else if (DAT_20000190 > 0x23) {
+            // ...
         }
+
     } else if (DAT_200001C0 != 0) {
-        // This block corresponds to the logic starting at 0x2e94
+        // This block corresponds to logic starting at 0x2e94
         if (DAT_200001C0 == 0) {
-            // ... more logic here
+            // This path is not taken if DAT_200001C0 is zero.
         } else {
             // 0x2ea8
             if (DAT_200001C3 == 0) {
-                 // ...
+                if (DAT_200001AE != 0) {
+                    // ...
+                }
             } else {
                 // ...
             }

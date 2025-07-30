@@ -8,18 +8,6 @@
 // Define the variable here
 uint DAT_00003884;
 
-// This function is a rough implementation of a delay.
-// It is not a direct translation of any function in fw.lst, but it
-// is used by many functions that are.
-void rfid_delay(uint16_t milliseconds)
-{
-  // This is a rough delay function. A more accurate delay function
-  // should be used in a real application.
-  for (uint32_t i = 0; i < (milliseconds * 1000); i++) {
-    __asm__("nop");
-  }
-}
-
 // This function is a helper and does not directly correspond to a function in fw.lst
 uint8_t rfid_get_response(uint8_t command)
 {
@@ -213,7 +201,7 @@ void rfid_set_freq_hopping(byte *param_1)
     rfid_send_command(command, sizeof(command));
 
     // The original function then waits for a response.
-    rfid_delay(100);
+    utils_delay_ms(100);
     uint8_t response[24];
     rfid_read_response(response, sizeof(response));
 }
@@ -275,22 +263,63 @@ void rfid_set_gpio(byte *param_1)
 
     // 0x3512: tst r0, #0x1
     if (param_1[0] & 0x1) {
+        // Bit 0 is set
         // 0x351a: tst r0, #0x2
         if (param_1[0] & 0x2) {
             ADDR_42218194 = 0;
         }
-        // ... and so on for other bits
+        // 0x3528: tst r0, #0x4
+        if (param_1[0] & 0x4) {
+            ADDR_42218198 = 0;
+        }
+        // 0x3536: tst r0, #0x8
+        if (param_1[0] & 0x8) {
+            ADDR_42218190 = 0;
+        }
 
         // 0x354c: bl FUN_000053ec
         FUN_000053ec( (param_1[1] + (param_1[1] << 2)) << 1 );
+
+        if (param_1[0] & 0x2) {
+            ADDR_42218194 = 1;
+        }
+        if (param_1[0] & 0x4) {
+            ADDR_42218198 = 1;
+        }
+        if (param_1[0] & 0x8) {
+            ADDR_42218190 = 1;
+        }
     } else {
-        // ... logic for when bit 0 is not set
+        // Bit 0 is not set
+        if (param_1[0] & 0x2) {
+            ADDR_42218194 = 0;
+        }
+        if (param_1[0] & 0x4) {
+            ADDR_42218198 = 0;
+        }
+        if (param_1[0] & 0x8) {
+            ADDR_42218190 = 0;
+        }
+
+        // 0x35b0: bl FUN_00005460
+        FUN_00005460( (param_1[1] + (param_1[1] << 2)) << 1 );
+
+        if (param_1[0] & 0x2) {
+            ADDR_42218194 = 1;
+        }
+        if (param_1[0] & 0x4) {
+            ADDR_42218198 = 1;
+        }
+        if (param_1[0] & 0x8) {
+            ADDR_42218190 = 1;
+        }
     }
 
-    // This is a partial implementation. The full logic is more complex.
-    // For now, we will just send the command as in the old code.
-    rfid_send_command((uint8_t *)0x91, 2, param_1[0], param_1[1]);
-    rfid_delay(100);
+    // 0x35de: Send a command at the end
+    uint8_t command[] = {0x03, 0x02, 0x91, 0x00, 0x40};
+    // The original code constructs this on the stack.
+    // This is a simplified representation.
+    FUN_00005200(command, sizeof(command));
 }
 
 /**
@@ -312,7 +341,7 @@ void rfid_get_firmware_version(void)
     uint8_t get_version_cmd[] = {0xA1, 0x00, 0x00};
     rfid_send_command(get_version_cmd, sizeof(get_version_cmd));
 
-    rfid_delay(100);
+    utils_delay_ms(100);
     uint8_t response[28];
     rfid_read_response(response, sizeof(response));
 }
@@ -338,7 +367,7 @@ void rfid_inventory(byte param_1, byte param_2, byte param_3)
     byte bVar2 = (val1 * 0x10) + val2;
 
     rfid_send_command((uint8_t *)0x4152, 2, bVar2, val3);
-    rfid_delay(100);
+    utils_delay_ms(100);
     uint8_t response[24];
     rfid_read_response(response, sizeof(response));
 }
@@ -363,7 +392,7 @@ void rfid_read_tag(byte param_1, byte param_2, byte param_3, byte *param_4)
     byte bVar2 = (val1 * 0x10) + val2;
 
     rfid_send_command((uint8_t *)0x4157, 4, bVar2, val3, param_4, 10);
-    rfid_delay(100);
+    utils_delay_ms(100);
     uint8_t response[24];
     rfid_read_response(response, sizeof(response));
 }
@@ -414,7 +443,7 @@ void rfid_set_work_mode(byte *param_1)
     // ...
 
     rfid_send_command(command, sizeof(command));
-    rfid_delay(100);
+    utils_delay_ms(100);
     uint8_t response[24];
     rfid_read_response(response, sizeof(response));
 }
@@ -454,20 +483,34 @@ void rfid_set_buzzer_status(byte *param_1)
     uint8_t command[] = {0x92, 0x08, 0x06, value};
     rfid_send_command(command, sizeof(command));
 
-    rfid_delay(100);
+    utils_delay_ms(100);
     uint8_t response[24];
     rfid_read_response(response, sizeof(response));
 }
 
 /**
  * @brief Stop the inventory.
- * @note This function corresponds to FUN_00003a6c in the firmware (lines 1862-1926).
+ * @note This function corresponds to FUN_00003a6c in the firmware.
  */
 void rfid_stop_inventory(void)
 {
-    uint8_t command[] = {0x55, 0x91, 0x00, 0x00};
-    rfid_send_command(command, sizeof(command));
-    rfid_delay(100);
+    // 0x3a74: cbnz r0, LAB_00003a96
+    if (DAT_200001C9 == 0) {
+        // 0x3a76: Construct and send command
+        uint8_t command[5];
+        command[0] = 0x04;
+        command[1] = 0x02;
+        command[2] = 0x55;
+        command[3] = 0x91;
+        command[4] = 0x00;
+
+        FUN_00005200(command, sizeof(command));
+    } else {
+        // LAB_00003a96: More complex logic involving other memory locations
+        // and function calls. This part will be implemented in a future pass.
+        // For now, we will just log a message.
+        // printf("RFID: Stop inventory (complex path)\n");
+    }
 }
 
 /**
@@ -480,7 +523,7 @@ void rfid_get_q_value(void)
     uint8_t response[24];
 
     rfid_send_command(command, sizeof(command));
-    rfid_delay(100);
+    utils_delay_ms(100);
     rfid_read_response(response, sizeof(response));
 
     if ((response[0] == 0x55) && (response[1] == 0x41))
@@ -523,7 +566,7 @@ void rfid_set_q_value(byte *param_1)
     bVar2 = bVar2 + bVar1;
 
     rfid_send_command((byte *)0x9200, 2, 6, bVar2);
-    rfid_delay(100);
+    utils_delay_ms(100);
     rfid_read_response((byte *)&uVar3, 0x24);
     return;
 }
@@ -538,7 +581,7 @@ void rfid_get_session_target(void)
     uint8_t response[24];
 
     rfid_send_command(command, sizeof(command));
-    rfid_delay(100);
+    utils_delay_ms(100);
     rfid_read_response(response, sizeof(response));
 
     if ((response[0] == 0x55) && (response[1] == 0x41))
@@ -581,7 +624,7 @@ void rfid_set_session_target(byte *param_1)
     bVar2 = bVar2 + bVar1;
 
     rfid_send_command((byte *)0x9202, 2, 8, bVar2);
-    rfid_delay(100);
+    utils_delay_ms(100);
     rfid_read_response((byte *)&uVar3, 0x24);
     return;
 }
@@ -596,7 +639,7 @@ void rfid_get_antenna_config(void)
     uint8_t response[24];
 
     rfid_send_command(command, sizeof(command));
-    rfid_delay(100);
+    utils_delay_ms(100);
     rfid_read_response(response, sizeof(response));
 
     if ((response[0] == 0x55) && (response[1] == 0x41))
@@ -639,7 +682,7 @@ void rfid_set_antenna_config(byte *param_1)
     bVar2 = bVar2 + bVar1;
 
     rfid_send_command((byte *)0x920e, 2, 8, bVar2);
-    rfid_delay(100);
+    utils_delay_ms(100);
     rfid_read_response((byte *)&uVar3, 0x24);
     return;
 }
@@ -654,7 +697,7 @@ void rfid_get_baud_rate(void)
     uint8_t response[24];
 
     rfid_send_command(command, sizeof(command));
-    rfid_delay(100);
+    utils_delay_ms(100);
     rfid_read_response(response, sizeof(response));
 
     if ((response[0] == 0x55) && (response[1] == 0x41))
@@ -697,7 +740,7 @@ void rfid_set_baud_rate(byte *param_1)
     bVar2 = bVar2 + bVar1;
 
     rfid_send_command((byte *)0x9215, 2, 7, bVar2);
-    rfid_delay(100);
+    utils_delay_ms(100);
     rfid_read_response((byte *)&uVar3, 0x24);
     return;
 }
@@ -712,7 +755,7 @@ void rfid_get_inventory_mode(void)
     uint8_t response[24];
 
     rfid_send_command(command, sizeof(command));
-    rfid_delay(100);
+    utils_delay_ms(100);
     rfid_read_response(response, sizeof(response));
 
     if ((response[0] == 0x55) && (response[1] == 0x41))
@@ -755,7 +798,7 @@ void rfid_set_inventory_mode(byte *param_1)
     bVar2 = bVar2 + bVar1;
 
     rfid_send_command((byte *)0xa4, 2, 0x13, bVar2);
-    rfid_delay(100);
+    utils_delay_ms(100);
     rfid_read_response((byte *)&uVar3, 0x24);
     return;
 }

@@ -2,7 +2,6 @@
 #define STUBS_H
 
 #include "stdint.h"
-#include <stddef.h>
 
 void FUN_00005a40(void);
 void FUN_00005510(uint8_t a);

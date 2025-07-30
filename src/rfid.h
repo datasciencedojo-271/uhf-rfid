@@ -75,6 +75,7 @@ uint16_t rfid_read_response(uint8_t *buffer, uint16_t length);
 bool rfid_has_data(void);
 // Corresponds to FUN_00005a44 in fw.lst
 void rfid_init(void);
+void hw_send_command_and_wait(uint8_t cmd, uint8_t len, void* data);
 
 // Corresponds to FUN_00003d44 in fw.lst
 void FUN_00003d44(void);

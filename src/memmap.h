@@ -2,13 +2,17 @@
 #define MEMMAP_H
 
 #include <stdint.h>
+#include "iwdg_types.h"
+#include "nvic_types.h"
+#include "system_types.h"
+#include "systick_types.h"
 
 /* These are volatile as they can be changed by hardware or other threads. */
 
 /* Data Memory */
 #define DAT_20000000 ((volatile uint8_t *)0x20000000)
 #define DAT_20000026 (*(volatile uint8_t *)0x20000026)
-#define DAT_20000027 (*(volatile uint8_t *)0x20000027)
+#define DAT_20000027 ((volatile uint8_t *)0x20000027)
 #define DAT_2000002F (*(volatile uint8_t *)0x2000002F)
 #define DAT_20000030 (*(volatile uint16_t *)0x20000030)
 #define DAT_200000A5 (*(volatile uint8_t *)0x200000A5)
@@ -68,5 +72,10 @@
 #define ADDR_42218190 (*(volatile uint32_t*)0x42218190)
 #define ADDR_42218194 (*(volatile uint8_t*)0x42218194)
 #define ADDR_42218198 (*(volatile uint8_t*)0x42218198)
+
+#define IWDG ((volatile IWDG_TypeDef *)0x40003000)
+#define NVIC ((volatile NVIC_Type *)0xE000E100)
+#define SCB ((volatile SCB_Type *)0xE000ED00)
+#define SysTick ((volatile SysTick_Type *)0xE000E010)
 
 #endif // MEMMAP_H

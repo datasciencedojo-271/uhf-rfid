@@ -1,5 +1,7 @@
 #include "utils.h"
 
+typedef unsigned long size_t;
+
 /**
  * @brief Calculate the checksum of a byte array.
  * @param data The data to calculate the checksum of.
@@ -45,6 +47,12 @@ void utils_memset(void *dst, uint8_t value, uint16_t length)
   for (uint16_t i = 0; i < length; i++) {
     d[i] = value;
   }
+}
+
+// Provide memset for compiler
+void *memset(void *s, int c, size_t n) {
+  utils_memset(s, (uint8_t)c, (uint16_t)n);
+  return s;
 }
 
 /**

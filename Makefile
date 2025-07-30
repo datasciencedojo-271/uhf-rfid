@@ -55,7 +55,7 @@ $(BUILD_DIR):
 # Link the executable
 #
 $(EXE): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS)
+	$(CC) -nostdlib -o $@ $(OBJS)
 
 #
 # Compile the source files

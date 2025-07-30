@@ -1,109 +1,103 @@
+#include <string.h>
 #include "main.h"
 #include "uart.h"
 #include "rfid.h"
-#include "utils.h"
+#include "gpio.h"
+#include "memmap.h"
+#include "stubs.h"
 
-// Command buffer
-uint8_t command_buffer[256];
+// This function is a C translation of the main processing loop from the firmware,
+// originally located at address FUN_00002c8c in the disassembly.
+void main_loop_body(void) {
+    // These buffers are located on the stack in the original firmware.
+    // They are used for temporary storage during command processing.
+    uint8_t local_buf_bc[52];
+    uint8_t local_buf_88[52];
+    uint8_t local_buf_54[52];
+    uint8_t local_buf_20[52];
 
-// Response buffer
-uint8_t response_buffer[256];
+    uint32_t local_stack_vars_1[4];
+    uint32_t local_stack_vars_2[4];
 
-// Function prototypes
-void handle_host_command(void);
-void handle_rfid_response(void);
-void process_rfid_data(void);
-void send_response_to_host(void);
+    static uint32_t r9_counter = 0; // This register is used as a persistent counter
 
-/**
- * @brief Main loop.
- * @note This function corresponds to the main loop in FUN_00002c8c in the firmware (lines 9424-10650).
- */
-void main_loop(void)
-{
-    if (uart_has_data()) {
-        handle_host_command();
+    // 0x2c92 - 0x2cae: Zero out local stack buffers
+    FUN_000003ba(local_buf_bc, sizeof(local_buf_bc));
+    FUN_000003ba(local_buf_88, sizeof(local_buf_88));
+    FUN_000003ba(local_buf_54, sizeof(local_buf_54));
+    FUN_000003ba(local_buf_20, sizeof(local_buf_20));
+
+    // 0x2cb2 - 0x2cce: Load data from flash into stack variables.
+    // These are likely configuration constants or tables.
+    memcpy(local_stack_vars_1, (void*)DAT_08009308, sizeof(local_stack_vars_1));
+    memcpy(local_stack_vars_2, (void*)DAT_08003090, sizeof(local_stack_vars_2));
+
+    // 0x2cd0 - 0x2cee: Initialize a buffer at DAT_20000027 with 8 zeros
+    for (int i = 0; i < 8; i++) {
+        DAT_20000027[i] = 0;
     }
 
-    if (rfid_has_data()) {
-        handle_rfid_response();
+    // -- Main Loop Logic --
+    // 0x2cf0: Check if there are any commands to process. If not, exit.
+    if (DAT_200001B9 == 0 && DAT_200001C0 == 0) {
+        return;
     }
 
-    process_rfid_data();
+    // 0x2d02: Main state machine based on the value of DAT_200001B9
+    if (DAT_200001B9 != 0) {
+        // 0x2d0c: Send some data via UART
+        FUN_00002c4c(local_buf_20, 9);
 
-    send_response_to_host();
+        // 0x2d1a: This is a frequently used loop point in the original code
+        while(1) {
+            r9_counter++;
+            FUN_00001758(); // Likely a delay or status update function
+
+            if (DAT_20000190 > 0x17) {
+                if ( (ADDR_2000029C[0x12] == 0xa0) && (ADDR_2000029C[0x13] == 0x04) ) {
+                    DAT_20000190 = 0;
+                    DAT_2000002F++;
+                    if (DAT_2000002F != 0) {
+                        DAT_2000002F = 0;
+                        ADDR_42218194 = 0;
+                        ADDR_42218190 = 1;
+                        ADDR_42218198 = 1;
+                    }
+                    return;
+                }
+            }
+            break;
+        }
+    } else if (DAT_200001C0 != 0) {
+        // This block corresponds to the logic starting at 0x2e94
+        if (DAT_200001C0 == 0) {
+            // ... more logic here
+        } else {
+            // 0x2ea8
+            if (DAT_200001C3 == 0) {
+                 // ...
+            } else {
+                // ...
+            }
+        }
+    }
+
+    // The rest of the function is a large state machine that is too complex
+    // to fully represent in a single step. This implementation covers the main entry
+    // points and decision branches. Further details will be filled in as each
+    // sub-function is analyzed.
 }
 
-/**
- * @brief Main function.
- * @note This function corresponds to the Entry Point in the firmware.
- */
-int main(void)
-{
-    uart_init();
-    rfid_init();
+int main(void) {
+    // In a real embedded system, this would be the entry point.
+    // It calls initialization routines and then enters an infinite loop.
 
-    while (1) {
-        main_loop();
+    // FUN_00005a44 is the main initialization function from the firmware
+    FUN_00005a44();
+
+    while(1) {
+        main_loop_body();
     }
-}
 
-/**
- * @brief Handle a command from the host.
- * @note This function is a part of the main loop in FUN_00002c8c in the firmware.
- */
-void handle_host_command(void)
-{
-    uint8_t command_length;
-
-    // Read the command from the host
-    command_length = uart_read(command_buffer, sizeof(command_buffer));
-
-    // If a command was received, process it
-    if (command_length > 0) {
-        rfid_process_command(command_buffer);
-    }
-}
-
-/**
- * @brief Handle a response from the RFID module.
- * @note This function is a part of the main loop in FUN_00002c8c in the firmware.
- */
-void handle_rfid_response(void)
-{
-    uint8_t response_length;
-
-    // Read the response from the RFID module
-    response_length = rfid_read_response(response_buffer, sizeof(response_buffer));
-
-    // If a response was received, process it
-    if (response_length > 0) {
-        // This will be implemented in a future step
-    }
-}
-
-/**
- * @brief Process data from the RFID module.
- * @note This function is a part of the main loop in FUN_00002c8c in the firmware.
- */
-void process_rfid_data(void)
-{
-    // This function will be implemented in a future step.
-    // For now, we'll just print the data to the console.
-    if (response_buffer[0] != 0) {
-        // RFID data processing (printf removed for embedded)
-    }
-}
-
-/**
- * @brief Send a response to the host.
- * @note This function is a part of the main loop in FUN_00002c8c in the firmware.
- */
-void send_response_to_host(void)
-{
-    // This function will be implemented in a future step.
-    // For now, we'll just clear the response buffer.
-    if (response_buffer[0] != 0) {
-        utils_memset(response_buffer, 0, sizeof(response_buffer));
-    }
+    return 0;
 }

@@ -240,3 +240,4 @@ This command performs an inventory of tags in the reader's field. The response c
 
 *   **Data:**
     *   `[0-11]`: EPC of the first tag found (12 bytes)
+

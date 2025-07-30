@@ -8,6 +8,9 @@
 #define USART1_CR2 (*(volatile uint32_t *)(USART1_BASE + 0x10))
 #define USART1_CR3 (*(volatile uint32_t *)(USART1_BASE + 0x14))
 
+/**
+ * @brief Initialize the UART.
+ */
 void uart_init(void)
 {
   // This is a placeholder for the UART initialization function.
@@ -15,6 +18,11 @@ void uart_init(void)
   // peripheral with the correct baud rate, parity, etc.
 }
 
+/**
+ * @brief Write data to the UART.
+ * @param data The data to write.
+ * @param length The length of the data.
+ */
 void uart_write(uint8_t *data, uint16_t length)
 {
   for (uint16_t i = 0; i < length; i++) {
@@ -24,6 +32,12 @@ void uart_write(uint8_t *data, uint16_t length)
   while ((USART1_SR & 0x40) == 0);
 }
 
+/**
+ * @brief Read data from the UART.
+ * @param data The buffer to store the data.
+ * @param length The maximum length to read.
+ * @return The number of bytes read.
+ */
 uint16_t uart_read(uint8_t *data, uint16_t length)
 {
   uint16_t i = 0;
@@ -36,6 +50,10 @@ uint16_t uart_read(uint8_t *data, uint16_t length)
   return i;
 }
 
+/**
+ * @brief Check if the UART has data.
+ * @return True if the UART has data, false otherwise.
+ */
 bool uart_has_data(void)
 {
     return (USART1_SR & 0x20) != 0;

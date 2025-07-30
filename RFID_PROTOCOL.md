@@ -15,13 +15,13 @@ All communication between the host and the reader is done through packets. The g
 *   `[n+1]`: Checksum
 *   `[n+2]`: End of frame (0xC0)
 
-The checksum is calculated as the sum of all bytes from the length to the data, modulo 256. A status code of `0x00` indicates success. Any other value indicates an error.
+The checksum is calculated as the sum of all bytes from the length to the data, modulo 256. A status code of `0x00` indicates success. Any other value indicates an error. The response is sent back to the UART byte by byte, in the order specified above.
 
 ## Commands
 
 ### 1. Get Firmware Version (0x01)
 
-This command retrieves the firmware version.
+This command retrieves the firmware version. The firmware version is a 2-byte value that is hardcoded in the firmware.
 
 **Request**
 
@@ -35,7 +35,7 @@ This command retrieves the firmware version.
 
 ### 2. Get Reader ID (0x02)
 
-This command retrieves the reader's unique ID.
+This command retrieves the reader's unique ID. The reader ID is a 4-byte value that is stored in non-volatile memory.
 
 **Request**
 
@@ -49,7 +49,7 @@ This command retrieves the reader's unique ID.
 
 ### 3. Reset (0x03)
 
-This command resets the RFID reader.
+This command resets the RFID reader by performing a software reset.
 
 **Request**
 
@@ -62,7 +62,7 @@ This command resets the RFID reader.
 
 ### 4. Set Reader ID (0x04)
 
-This command sets the reader's unique ID.
+This command sets the reader's unique ID. The reader ID is stored in non-volatile memory.
 
 **Request**
 
@@ -76,7 +76,7 @@ This command sets the reader's unique ID.
 
 ### 5. Set Baud Rate (0x06)
 
-This command sets the serial communication baud rate.
+This command sets the serial communication baud rate. The baud rate is stored in non-volatile memory.
 
 **Request**
 
@@ -95,7 +95,7 @@ This command sets the serial communication baud rate.
 
 ### 6. Get Work Mode (0x08)
 
-This command retrieves the current work mode of the reader.
+This command retrieves the current work mode of the reader. The work mode is stored in non-volatile memory.
 
 **Request**
 
@@ -111,7 +111,7 @@ This command retrieves the current work mode of the reader.
 
 ### 7. Set Work Mode (0x09)
 
-This command sets the work mode of the reader.
+This command sets the work mode of the reader. The work mode is stored in non-volatile memory.
 
 **Request**
 
@@ -127,7 +127,7 @@ This command sets the work mode of the reader.
 
 ### 8. Read (0x80)
 
-This command reads data from the specified memory area of the tag.
+This command reads 4 bytes of data from the specified memory area and address of the tag. The response is sent back to the UART as four bytes, with the most significant byte first.
 
 **Request**
 
@@ -146,7 +146,7 @@ This command reads data from the specified memory area of the tag.
 
 ### 9. Write (0x81)
 
-This command writes data to the specified memory area of the tag.
+This command writes 4 bytes of data to the specified memory area and address of the tag.
 
 **Request**
 
@@ -164,7 +164,7 @@ This command writes data to the specified memory area of the tag.
 
 ### 10. Lock (0x82)
 
-This command locks or unlocks the specified memory area of the tag.
+This command locks or unlocks the specified memory area of the tag. This operation is permanent if the `Perma-Lock` or `Perma-Unlock` lock type is used.
 
 **Request**
 
@@ -188,7 +188,7 @@ This command locks or unlocks the specified memory area of the tag.
 
 ### 11. Kill (0x83)
 
-This command permanently deactivates the tag.
+This command permanently deactivates the tag. This operation is irreversible.
 
 **Request**
 
@@ -202,7 +202,7 @@ This command permanently deactivates the tag.
 
 ### 12. Inventory (0x91)
 
-This command performs an inventory of tags in the reader's field.
+This command performs an inventory of tags in the reader's field. The response contains the EPC of the first tag found.
 
 **Request**
 
@@ -216,3 +216,6 @@ This command performs an inventory of tags in the reader's field.
 
 *   **Data:**
     *   `[0-11]`: EPC of the first tag found (12 bytes)
+
+
+
